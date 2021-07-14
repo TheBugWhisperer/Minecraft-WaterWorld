@@ -1,0 +1,8 @@
+name: WaterWorld
+main: com.elmakers.mine.bukkit.plugins.WaterWorldPlugin
+version: 1.0
+api-version: 1.16
+website: http://mine.elmakers.com
+author: TheBugWhisperer
+description: A water world full of islands to build on
+load: STARTUP
