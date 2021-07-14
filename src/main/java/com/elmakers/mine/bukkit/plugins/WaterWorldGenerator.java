@@ -13,8 +13,9 @@ import java.util.Random;
 
 public class WaterWorldGenerator extends ChunkGenerator {
     private static final int SEA_LEVEL = 64;
-    private static final int HIGHEST_PEAK = 110;
-    private static final int LOWEST_LAKE = 60;
+    private static final int SAND_LEVEL = 6;
+    private static final int BEDROCK_LAYER = 1;
+    private static final int ISLAND_LAYER = 60;
     private final WaterWorldPlugin plugin;
 
     public WaterWorldGenerator(WaterWorldPlugin plugin) {
@@ -23,64 +24,28 @@ public class WaterWorldGenerator extends ChunkGenerator {
 
     @Override
     public ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ, BiomeGrid biome) {
-        random = new Random(world.getSeed());
-        SimplexOctaveGenerator generator = new SimplexOctaveGenerator(random, 8);
         ChunkData chunk = createChunkData(world);
-        generator.setScale(0.010D);
-
-        Material blockType;
-        int maxHeight;
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                // This number goes from -1 to 1
-                double noise = generator.noise(chunkX * 16 + x, chunkZ * 16 + z, 0.5D, 0.5D);
-                // This goes from 0 to 1
-                noise = (noise + 1) / 2;
-                // Change noise into a number from lowest lake to highest mountain peak
-                maxHeight = (int) (noise * (HIGHEST_PEAK - LOWEST_LAKE) + LOWEST_LAKE);
+                for (int y = SEA_LEVEL; y > ISLAND_LAYER; y--) {
 
-                for (int y = SEA_LEVEL; y > maxHeight; y--) {
-                    switch (random.nextInt(4)) {
-                        case 0:
-                            blockType = Material.PACKED_ICE;
-                            break;
-                        case 1:
-                            blockType = Material.ICE;
-                            break;
-                        default:
-                            blockType = Material.BLUE_ICE;
-                            break;
-                    }
-                    biome.setBiome(x, y, z, Biome.CRIMSON_FOREST);
-                    chunk.setBlock(x, y, z, blockType);
+                    boolean ocean =true;
+                    int wx=x+chunkX*16;
+                    int wz=z+chunkZ*16;
+                    wx = wx % 500;
+                    wz = wz % 500;
+                    if (wx>450 && wx<499 && wz>450 && wz<499)
+                        ocean=false;
+                    if(ocean)
+                        chunk.setBlock(x, y, z, Material.WATER);
+                    else
+                        chunk.setBlock(x, y, z, Material.SMOOTH_SANDSTONE);
                 }
-                for (int y = maxHeight; y > 0; y--) {
-                    if (y > maxHeight - 3) {
-                        blockType = Material.RED_SAND;
-                    } else if (y > maxHeight - 8) {
-                        blockType = Material.RED_SANDSTONE;
-                    } else {
-                        switch (random.nextInt(4)) {
-                            case 0:
-                                blockType = Material.RED_TERRACOTTA;
-                                break;
-                            case 1:
-                                blockType = Material.ORANGE_TERRACOTTA;
-                                break;
-                            case 2:
-                                blockType = Material.TERRACOTTA;
-                                break;
-                            case 3:
-                                blockType = Material.YELLOW_TERRACOTTA;
-                                break;
-                            default:
-                                blockType = Material.BROWN_TERRACOTTA;
-                                break;
-                        }
-                    }
-
-                    biome.setBiome(x, y, z, Biome.CRIMSON_FOREST);
-                    chunk.setBlock(x, y, z, blockType);
+                for (int y = ISLAND_LAYER; y > SAND_LEVEL; y--) {
+                    chunk.setBlock(x, y, z, Material.WATER);
+                }
+                for (int y = SAND_LEVEL; y >= BEDROCK_LAYER; y--) {
+                    chunk.setBlock(x, y, z, Material.SAND);
                 }
                 chunk.setBlock(x, 0, z, Material.BEDROCK);
             }
