@@ -30,8 +30,8 @@ public class WaterWorldGenerator extends ChunkGenerator {
                 for (int y = SEA_LEVEL; y > ISLAND_LAYER; y--) {
 
                     boolean ocean =true;
-                    int wx=x+chunkX*16;
-                    int wz=z+chunkZ*16;
+                    int wx = Math.abs(x+chunkX*16);
+                    int wz = Math.abs(z+chunkZ*16);
                     wx = wx % 500;
                     wz = wz % 500;
                     if (wx>450 && wx<499 && wz>450 && wz<499)
